@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/NetworkSecuredWebApp/src/WebApp/obj
+/NetworkSecuredWebApp/src/WebApp/bin/Debug/net6.0
+/NetworkSecuredWebApp/src/WebApp/.vs/WebApp
