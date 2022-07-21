@@ -5,3 +5,6 @@
 /NetworkSecuredWebApp/src/WebApp/obj
 /NetworkSecuredWebApp/src/WebApp/bin/Debug/net6.0
 /NetworkSecuredWebApp/src/WebApp/.vs/WebApp
+/NetworkSecuredWebApp/src/WebApp/bin/Release/net6.0
+/NetworkSecuredWebApp/src/WebApp/Properties
+/NetworkSecuredWebApp/src/WebApp/WebApp.csproj.user
