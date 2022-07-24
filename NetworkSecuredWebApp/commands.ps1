@@ -103,7 +103,7 @@ az network private-endpoint dns-zone-group create `
 $dockerImage = 'chintupawan/pjtalkstech:nwsecweb_0.1'
 az webapp config container set --docker-custom-image-name $dockerImage --name 'pa1-poc-web' --resource-group $rg
 
-az webapp config connection-string set --connection-string-type SQLAzure -g $rg -n 'pa1-poc-web' --settings Default='Server=tcp:pa1-poc-sql.database.windows.net,1433;Initial Catalog=orgdb;Persist Security Info=False;User ID=pa1sqladmin;Password=pa1sqlP4ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+az webapp config connection-string set --connection-string-type SQLAzure -g $rg -n 'pa1-poc-web' --settings Default=''
 
 
 #Azure Front Door
@@ -169,12 +169,13 @@ az network private-link-resource list `
     --name pa1-poc-web `
     --type Microsoft.Web/sites
 
+    #create Firewall
 $fwName = "pa1-poc-fw"
     az network firewall create `
     --name $fwName `
     --resource-group $rg `
     --location $loc
-
+# create Public IP
 $pip = "pa1-poc-pip"
 az network public-ip create `
     --name $pip `
@@ -199,8 +200,8 @@ az network public-ip show `
     --resource-group $rg
 $fwprivaddr="$(az network firewall ip-config list -g $rg -f $fwName --query "[?name=='FW-config'].privateIpAddress" --output tsv)"
 
+#create route table
 $rt = "pocrt-table"
-
 az network route-table create `
     --name $rt `
     --resource-group $rg `
@@ -215,12 +216,26 @@ az network route-table route create `
   --next-hop-type VirtualAppliance `
   --next-hop-ip-address $fwprivaddr
 
-
-  az network vnet subnet update --help `
+#associate route table to ovnet
+  az network vnet subnet update `
   -n $intgnet `
   -g $rg `
   --vnet-name $vnet `
   --address-prefixes 10.0.3.0/24 `
   --route-table $rt
   
+  #create application firewall
+  az network firewall application-rule create `
+  --collection-name poccoll `
+  --firewall-name $fwName `
+  --name AllowAPI `
+  --protocols Http=80 Https=443 `
+  --resource-group $rg `
+  --target-fqdns api.my-ip.io `
+  --source-addresses 10.0.3.0/24 `
+  --priority 200 `
+  --action Allow
+
+
+
 ##az network private-endpoint-connection list --id $webappid --query "[].[name,?properties.provisioningState == 'Pending']"
